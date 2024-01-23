@@ -83,6 +83,8 @@ class VoiceModInternal extends events.EventEmitter {
 
     if(this.listenerCount(data.action))
       this.emit(data.action, data.payload);
+    else if(this.listenerCount(data.actionType))
+      this.emit(data.actionType, data.actionObject);
   }
   onError(){
     this.currentPort++;
