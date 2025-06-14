@@ -13,6 +13,7 @@ class VoiceModInternal extends events.EventEmitter {
   constructor( interf, promise ){
     super();
 
+    this.appVersion = 0;
     this.interface = interf;
     this.currentPort = 0;
     this.opened = false;
@@ -62,11 +63,16 @@ class VoiceModInternal extends events.EventEmitter {
   }
   onMessage( msg ){
     let data = JSON.parse(msg.data);
-    // console.log(data); // For verbose logging
+    // console.log("OnMessage: ", data); // For verbose logging
+
+    if (data.appVersion) {
+      this.appVersion = data.appVersion;
+      // console.log("App Version: ", data.appVersion);
+    }
 
     switch(data.action){
       case 'registerClient':
-        if(data.actionObject.status.code === 200){
+        if(data.payload.status.code == '200'){
           this.authenticated = true;
           this.promise.res();
           this.interface.loaded = true;
@@ -76,13 +82,13 @@ class VoiceModInternal extends events.EventEmitter {
         break;
     }
 
-    if(this.cb[data.id]){
-      this.cb[data.id](data.payload);
-      this.cb[data.id] = null;
+    if(this.cb[data.actionId]){
+      this.cb[data.actionId](data.actionObject);
+      this.cb[data.actionId] = null;
     }
 
-    if(this.listenerCount(data.action))
-      this.emit(data.action, data.payload);
+    if(this.listenerCount(data.actionType))
+      this.emit(data.actionType, data.actionObject);
     else if(this.listenerCount(data.actionType))
       this.emit(data.actionType, data.actionObject);
   }
