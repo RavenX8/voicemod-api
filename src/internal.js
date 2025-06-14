@@ -66,7 +66,7 @@ class VoiceModInternal extends events.EventEmitter {
 
     switch(data.action){
       case 'registerClient':
-        if(data.payload.status.code === '200'){
+        if(data.actionObject.status.code === 200){
           this.authenticated = true;
           this.promise.res();
           this.interface.loaded = true;
